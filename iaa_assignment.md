@@ -126,7 +126,7 @@ LIMIT 5
 
 </br>
 
-**question 3:**
+**question 3 - intepretation 1:** furthest distance between stations with a completed ride between them
 
 ```
 SELECT DISTINCT 
@@ -151,3 +151,26 @@ LIMIT 3
 | Capital Metro HQ - East 5th at Broadway | Lake Austin & Enfield | 8,246 |
 | Lake Austin & Enfield | Capital Metro HQ - East 5th at Broadway | 8,246 |
 | East 6th & Pedernales St. | Lake Austin & Enfield | 7,709 |
+
+</br>
+
+**question 3 - intepretation 2:** furthest distance between any two stations
+
+```
+SELECT t1.name AS s1_name,
+       t2.name AS s2_name,
+       ST_DISTANCE(ST_GEOGPOINT(t1.longitude, t1.latitude), 
+                   ST_GEOGPOINT(t2.longitude, t2.latitude)) AS dist      
+FROM `bigquery-public-data.austin_bikeshare.bikeshare_stations` as t1
+CROSS JOIN `bigquery-public-data.austin_bikeshare.bikeshare_stations` as t2
+ORDER BY dist DESC
+LIMIT 3
+```
+
+**query results:**
+
+| **station 1** | **station 2** | **distance**|
+|---|---|---|
+| Lake Austin & Enfield | Lakeshore & Pleasant Valley | 8,600 |
+| Lakeshore & Pleasant Valley | Lake Austin & Enfield | 8,600 |
+| Capital Metro HQ - East 5th at Broadway | Lake Austin & Enfield | 8,246 |
