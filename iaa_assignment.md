@@ -147,7 +147,7 @@ LIMIT 3
 **query results:**
 
 | **start station** | **end station** | **distance** |
-|---|---|---|
+|---|---|---:|
 | Capital Metro HQ - East 5th at Broadway | Lake Austin & Enfield | 8,246 |
 | Lake Austin & Enfield | Capital Metro HQ - East 5th at Broadway | 8,246 |
 | East 6th & Pedernales St. | Lake Austin & Enfield | 7,709 |
@@ -170,7 +170,7 @@ LIMIT 3
 **query results:**
 
 | **station 1** | **station 2** | **distance**|
-|---|---|---|
+|---|---|---:|
 | Lake Austin & Enfield | Lakeshore & Pleasant Valley | 8,600 |
 | Lakeshore & Pleasant Valley | Lake Austin & Enfield | 8,600 |
 | Capital Metro HQ - East 5th at Broadway | Lake Austin & Enfield | 8,246 |
