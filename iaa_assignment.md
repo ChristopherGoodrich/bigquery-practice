@@ -31,7 +31,7 @@ avaliable as public data in BigQuery (e.g.'bigquery-public-data.austin_bikeshare
  
 </br>
 
-########################################
+################################################################################
 
 </br>
  
@@ -41,15 +41,15 @@ avaliable as public data in BigQuery (e.g.'bigquery-public-data.austin_bikeshare
 
 | **route** | **count** |
 |---|---:|
-| 21st & Speedway @PCL to 21st & Speedway @PCL | 13,109 |
-| Riverside @ S. Lamar to Riverside @ S. Lamarr | 12,302 |
-| 21st & Speedway @PCL to Dean Keeton & Speedway | 10,173 |
-| Dean Keeton & Speedway to 21st & Speedway @PCL | 9,523 |
-| Rainey St @ Cummings to Rainey St @ Cummings | 8,676 |
+| 21st & Speedway @PCL to 21st & Speedway @PCL | 13,517 |
+| Riverside @ S. Lamar to Riverside @ S. Lamarr | 13,053 |
+| 21st & Speedway @PCL to Dean Keeton & Speedway | 12,651 |
+| Dean Keeton & Speedway to 21st & Speedway @PCL | 12,237 |
+| Rainey St @ Cummings to Rainey St @ Cummings | 9,121 |
 
 </br>
 
-########################################
+################################################################################
 
 </br>
 
@@ -75,6 +75,34 @@ avaliable as public data in BigQuery (e.g.'bigquery-public-data.austin_bikeshare
 
 **question 1:** most popular starting station
 
+</br>
+
+**GOOD query (see BAD query below for context):**
+
+```
+SELECT s.name AS start_station_name, COUNT(*) AS count
+FROM `bigquery-public-data.austin_bikeshare.bikeshare_trips` as t
+JOIN `bigquery-public-data.austin_bikeshare.bikeshare_stations` as s
+  ON t.start_station_id=s.station_id
+GROUP BY s.name
+ORDER BY count DESC
+LIMIT 3
+```
+
+**query results:**
+
+| **start_station_name** | **count** |
+|---|---|
+| 21st & Speedway @PCL | 76,350 |
+| Riverside @ S. Lamar | 42,442 |
+| City Hall / Lavaca & 2nd | 37,111 |
+
+</br>
+
+**BAD query - lesson learned:** 
+
+Below is a bad query. I originaly grouped on the **NAME** of a bike station in the trip data. It turns out that the station name field is not 1-to-1 with the station ID. Instead it is better to group by the station ID and then merge it to the station table to get the station name from there. The results are slightly different and it appears grouping by name does not give the correct count.
+
 ```
 SELECT t.start_station_name, 
        count(t.start_station_name) as count
@@ -94,17 +122,21 @@ LIMIT 3
 
 </br>
 
-########################################
+################################################################################
 
 </br>
 
 **question 2:** top 5 routes
 
 ```
-SELECT CONCAT(t.start_station_name, ' to ', t.end_station_name) AS route,
+SELECT CONCAT(s1.name, ' to ', s2.name) AS route,
        COUNT(*) as count
 FROM `bigquery-public-data.austin_bikeshare.bikeshare_trips` AS t
-GROUP BY t.start_station_name, t.end_station_name
+JOIN `bigquery-public-data.austin_bikeshare.bikeshare_stations` AS s1
+  ON t.start_station_id=s1.station_id
+JOIN `bigquery-public-data.austin_bikeshare.bikeshare_stations` AS s2
+  ON SAFE_CAST(t.end_station_id AS int64)=s2.station_id
+GROUP BY s1.name, s2.name
 ORDER BY count DESC
 LIMIT 5
 ```
@@ -113,16 +145,16 @@ LIMIT 5
 
 | **route** | **count** |
 |---|---:|
-| 21st & Speedway @PCL to 21st & Speedway @PCL | 13,109 |
-| Riverside @ S. Lamar to Riverside @ S. Lamarr | 12,302 |
-| 21st & Speedway @PCL to Dean Keeton & Speedway | 10,173 |
-| Dean Keeton & Speedway to 21st & Speedway @PCL | 9,523 |
-| Rainey St @ Cummings to Rainey St @ Cummings | 8,676 |
+| 21st & Speedway @PCL to 21st & Speedway @PCL | 13,517 |
+| Riverside @ S. Lamar to Riverside @ S. Lamarr | 13,053 |
+| 21st & Speedway @PCL to Dean Keeton & Speedway | 12,651 |
+| Dean Keeton & Speedway to 21st & Speedway @PCL | 12,237 |
+| Rainey St @ Cummings to Rainey St @ Cummings | 9,121 |
 
 
 </br>
 
-########################################
+################################################################################
 
 </br>
 
@@ -130,23 +162,23 @@ LIMIT 5
 
 ```
 SELECT DISTINCT 
-  t.start_station_name AS s_st,
-  t.end_station_name AS e_st,
-  ST_DISTANCE(ST_GEOGPOINT(st_s.longitude, st_s.latitude), 
-              ST_GEOGPOINT(st_e.longitude, st_e.latitude)) AS dist
+  st_s.name AS start_station_name,
+  st_e.name AS end_station_name,
+  ST_DISTANCE(ST_GEOGPOINT(st_s.longitude, st_s.latitude), 
+              ST_GEOGPOINT(st_e.longitude, st_e.latitude)) AS dist
 FROM `bigquery-public-data.austin_bikeshare.bikeshare_trips` AS t
 JOIN `bigquery-public-data.austin_bikeshare.bikeshare_stations` AS st_s
-  ON t.start_station_id=st_s.station_id
+  ON t.start_station_id=st_s.station_id
 JOIN `bigquery-public-data.austin_bikeshare.bikeshare_stations` AS st_e
-  ON SAFE_CAST(t.end_station_id AS INT64)=st_e.station_id
-GROUP BY s_st, e_st, dist
+  ON SAFE_CAST(t.end_station_id AS INT64)=st_e.station_id
+GROUP BY st_s.name, st_e.name, dist
 ORDER BY dist DESC
 LIMIT 3
 ```
 
 **query results:**
 
-| **start station** | **end station** | **distance** |
+| **start_station_name** | **end_station_name** | **distance** |
 |---|---|---:|
 | Capital Metro HQ - East 5th at Broadway | Lake Austin & Enfield | 8,246 |
 | Lake Austin & Enfield | Capital Metro HQ - East 5th at Broadway | 8,246 |
