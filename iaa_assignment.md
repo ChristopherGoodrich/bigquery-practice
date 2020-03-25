@@ -1,6 +1,6 @@
 ## Context:
 
-This is an assignment I completed for the Big Data class I took as part of the Masters of Science in Analytics at N.C. State's Institute for Advanced Analytics. The assignment was completed using the [Google BigQuery (free Sandbox version)](https://console.cloud.google.com/bigquery)
+This is an assignment I completed for the Big Data class I took as part of the Masters of Science in Analytics at N.C. State's Institute for Advanced Analytics. The assignment was completed using the [Google BigQuery (free Sandbox version)](https://console.cloud.google.com/bigquery). The questions are answered first and then below is the SQL code a snippet of the resulting query stored in Markdown tables
 
 ---
 
