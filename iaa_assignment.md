@@ -73,7 +73,7 @@ avaliable as public data in BigQuery (e.g.'bigquery-public-data.austin_bikeshare
 
 ## SQL Code:
 
-**question 1:**
+**question 1:** most popular starting station
 
 ```
 SELECT t.start_station_name, 
@@ -98,7 +98,7 @@ LIMIT 3
 
 </br>
 
-**question 2:**
+**question 2:** top 5 routes
 
 ```
 SELECT CONCAT(t.start_station_name, ' to ', t.end_station_name) AS route,
