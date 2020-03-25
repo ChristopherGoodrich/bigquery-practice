@@ -76,12 +76,12 @@ avaliable as public data in BigQuery (e.g.'bigquery-public-data.austin_bikeshare
 **question 1:**
 
 ```
-SELECT CONCAT(t.start_station_name, ' to ', t.end_station_name) AS route,
-       COUNT(*) as count
-FROM `bigquery-public-data.austin_bikeshare.bikeshare_trips` AS t
-GROUP BY t.start_station_name, t.end_station_name
+SELECT t.start_station_name, 
+       count(t.start_station_name) as count
+FROM `bigquery-public-data.austin_bikeshare.bikeshare_trips` as t
+GROUP BY t.start_station_name
 ORDER BY count DESC
-LIMIT 5
+LIMIT 3
 ```
 
 **query results:**
@@ -101,10 +101,10 @@ LIMIT 5
 **question 2:**
 
 ```
-SELECT route, COUNT(route) as count 
-FROM (SELECT CONCAT(t.start_station_name, ' to ', t.end_station_name) AS route,
-      FROM `bigquery-public-data.austin_bikeshare.bikeshare_trips` AS t)
-GROUP BY route
+SELECT CONCAT(t.start_station_name, ' to ', t.end_station_name) AS route,
+       COUNT(*) as count
+FROM `bigquery-public-data.austin_bikeshare.bikeshare_trips` AS t
+GROUP BY t.start_station_name, t.end_station_name
 ORDER BY count DESC
 LIMIT 5
 ```
